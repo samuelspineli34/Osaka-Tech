@@ -2,10 +2,10 @@ export function initSidebar() {
     const sidebarHtml = `
     <aside class="flex flex-col w-64 h-screen px-5 py-8 overflow-y-auto bg-slate-900 border-r border-slate-700 fixed left-0 top-0">
         <div class="flex items-center gap-x-3 px-2">
-            <span class="p-2 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span class="material-icons-round text-white">support_agent</span>
+            <span class="bg-white rounded-xl flex items-center justify-center">
+                <img src="/agent.png" alt="Agent" class="w-12 h-12">
             </span>
-            <span class="text-xl font-bold text-white tracking-tight">ServiceDesk</span>
+            <span class="text-xl font-bold text-white tracking-tight">Service Desk</span>
         </div>
 
         <nav class="flex-1 mt-10 space-y-2">
@@ -38,7 +38,7 @@ export function initSidebar() {
     const container = document.getElementById('sidebar-container');
     if (container) {
         container.innerHTML = sidebarHtml;
-        
+
         // Ativar link atual
         const currentPath = window.location.pathname;
         const links = container.querySelectorAll('.nav-link');

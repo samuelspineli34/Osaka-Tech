@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Desk - Users</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="/src/pages/users/user.ts"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+
+<body class="bg-slate-50 min-h-screen">
+
+    <!-- Container da Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Conteúdo Principal (Margem à esquerda de 64 para não ficar embaixo da sidebar) -->
+    <main class="ml-64 p-10">
+        <header class="mb-8 flex justify-between items-end">
+            <div>
+                <h1 class="text-3xl font-extrabold text-slate-900">Users</h1>
+                <p class="text-slate-500">Manage your organization members</p>
+            </div>
+            <button onclick="window.openUserModal()" class="...">
+                <span class="material-icons-round">add</span> New User
+            </button>
+        </header>
+
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <ul id="user-list" class="divide-y divide-slate-100">
+                <!-- Carregado via TS -->
+            </ul>
+        </section>
+    </main>
+
+    <!-- MODAIS -->
+    <div id="user-modal"
+        class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-[100]">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8">
+            <h2 id="modal-title" class="text-2xl font-bold mb-6 text-slate-800">Add New User</h2>
+            <form id="user-form" class="space-y-4">
+                <input type="hidden" id="field-id">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Full Name</label>
+                    <input type="text" id="field-name" required
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Email Address</label>
+                    <input type="email" id="field-email" required
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Department</label>
+                    <select id="field-dept"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="IT">IT Support</option>
+                        <option value="HR">Human Resources</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Sales">Sales</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-3 mt-8">
+                    <button type="button" onclick="window.closeUserModal()"
+                        class="px-4 py-2 text-slate-500 font-bold">Cancel</button>
+                    <button type="submit"
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold shadow-lg shadow-blue-200">Save
+                        User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

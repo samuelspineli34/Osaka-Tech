@@ -1,0 +1,201 @@
+############################
+# Sistema Operacional
+############################
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+
+############################
+# Windows
+############################
+
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+############################
+# Logs
+############################
+
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun.lockb.old
+
+############################
+# Node / Bun
+############################
+
+node_modules/
+bun.lockb
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+############################
+# Python
+############################
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyc.*
+*.py,cover
+.python-version
+*.py[cod]
+
+.venv/
+venv/
+env/
+ENV/
+
+pip-log.txt
+pip-delete-this-directory.txt
+
+############################
+# Virtual Environments
+############################
+
+.env
+.env.*
+*.env
+
+############################
+# IDEs
+############################
+
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+############################
+# VSCode
+############################
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+############################
+# JetBrains
+############################
+
+.idea/
+*.iml
+*.ipr
+*.iws
+
+############################
+# Mac
+############################
+
+.AppleDouble
+.LSOverride
+
+############################
+# Temporary files
+############################
+
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+############################
+# Build
+############################
+
+dist/
+build/
+out/
+target/
+
+############################
+# Coverage
+############################
+
+coverage/
+*.lcov
+
+############################
+# Database local
+############################
+
+*.sqlite
+*.sqlite3
+*.db
+
+############################
+# Secrets
+############################
+
+secrets.json
+credentials.json
+
+############################
+# Cache
+############################
+
+.cache/
+.parcel-cache/
+
+############################
+# TypeScript
+############################
+
+*.tsbuildinfo
+
+############################
+# Flask
+############################
+
+instance/
+.webassets-cache
+
+############################
+# Pytest
+############################
+
+.pytest_cache/
+
+############################
+# MyPy
+############################
+
+.mypy_cache/
+
+############################
+# Ruff / Linter
+############################
+
+.ruff_cache/
+
+############################
+# Docker
+############################
+
+.docker/
+
+############################
+# Misc
+############################
+
+*.bak
+*.backup
+*.old

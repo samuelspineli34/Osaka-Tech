@@ -93,3 +93,34 @@ class TicketDAO:
         conn.commit()
         cursor.close()
         conn.close()
+        
+    def add_audit_log(self, ticket_id, user_id, action, old_val, new_val):
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO ticket_audit_logs (ticket_id, user_id, action_type, old_value, new_value)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (ticket_id, user_id, action, str(old_val), str(new_val)))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    def get_history(self, ticket_id):
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        query = """
+            SELECT a.action_type, a.old_value, a.new_value, a.created_at, u.name
+            FROM ticket_audit_logs a
+            JOIN users u ON a.user_id = u.id
+            WHERE a.ticket_id = %s
+            ORDER BY a.created_at DESC
+        """
+        cursor.execute(query, (ticket_id,))
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return [{
+            "action": r[0], "old": r[1], "new": r[2], 
+            "date": r[3].strftime("%d/%m/%Y %H:%M"), "user": r[4]
+        } for r in rows]

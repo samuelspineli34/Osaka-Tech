@@ -65,11 +65,17 @@ function openRatingModal(ticketId: string) {
 async function openTicketModal(ticket?: Ticket) {
     const modal = document.getElementById('ticket-modal');
     const userSelect = document.getElementById('field-user') as HTMLSelectElement;
+    const auditSection = document.getElementById('audit-section'); // Seleciona a nova aba de log
+    const historyContainer = document.getElementById('ticket-history-list');
+
+    // Mostra o loader interno se necessário ou limpa o histórico anterior
+    if (historyContainer) historyContainer.innerHTML = '<div class="p-10 text-center text-slate-400 text-xs">Loading history...</div>';
 
     const users = await userService.getAllUsers();
     userSelect.innerHTML = users.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
 
     if (ticket) {
+        // MODO EDIÇÃO
         (document.getElementById('modal-title')!).textContent = 'Edit Ticket';
         (document.getElementById('field-id') as HTMLInputElement).value = ticket.id;
         (document.getElementById('field-title') as HTMLInputElement).value = ticket.title;
@@ -77,13 +83,22 @@ async function openTicketModal(ticket?: Ticket) {
         (document.getElementById('field-status') as HTMLSelectElement).value = ticket.status;
         (document.getElementById('field-priority') as HTMLSelectElement).value = ticket.priority;
         userSelect.value = ticket.user_id;
+
+        // --- Lógica da Auditoria ---
+        auditSection?.classList.remove('hidden'); // Mostra a coluna da direita
+        loadTicketHistory(ticket.id); // Chama a função que você já tem no código
     } else {
+        // MODO CRIAÇÃO
         (document.getElementById('modal-title')!).textContent = 'New Ticket';
         (document.getElementById('ticket-form') as HTMLFormElement).reset();
         (document.getElementById('field-id') as HTMLInputElement).value = '';
+        
+        auditSection?.classList.add('hidden'); // Esconde a coluna da direita em tickets novos
+        
         if (!isStaff) {
             userSelect.value = currentUser?.id || '';
-            document.getElementById('user-assign-container')!.style.display = 'none';
+            const container = document.getElementById('user-assign-container');
+            if (container) container.style.display = 'none';
         }
     }
     modal?.classList.remove('hidden');
@@ -111,6 +126,7 @@ function deleteTicket(id: string) {
 async function loadPage() {
     showLoader();
     initSidebar();
+    
     const list = document.getElementById('ticket-list');
     if (!list) return;
 
@@ -194,6 +210,44 @@ async function loadPage() {
         hideLoader();
     }
 }
+
+async function loadTicketHistory(ticketId: string) {
+    const container = document.getElementById('ticket-history-list');
+    if (!container) return;
+
+    try {
+        const history = await apiClient.get<any[]>(`/ticket/${ticketId}/history`);
+        
+        container.innerHTML = history.map(log => {
+            // Ícones dinâmicos conforme o tipo de alteração
+            const icon = log.action.includes('STATUS') ? 'sync' : 'priority_high';
+            const iconColor = log.action.includes('STATUS') ? 'text-blue-500' : 'text-amber-500';
+
+            return `
+                <div class="relative pl-6 pb-6 border-l-2 border-slate-100 last:border-0">
+                    <!-- Dot do Indicador -->
+                    <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center">
+                        <span class="material-icons-round text-[10px] ${iconColor}">${icon}</span>
+                    </div>
+                    
+                    <div class="text-xs">
+                        <p class="text-slate-800 font-black uppercase tracking-tighter mb-1">${log.user}</p>
+                        <p class="text-slate-500 font-medium leading-relaxed">
+                            Changed <span class="text-slate-900 font-bold">${log.action.replace('_CHANGE', '').toLowerCase()}</span> 
+                            from <span class="text-slate-400 line-through">${log.old}</span> 
+                            to <span class="text-blue-600 font-bold">${log.new}</span>
+                        </p>
+                        <p class="text-[10px] text-slate-300 font-bold mt-2 uppercase tracking-widest">${log.date}</p>
+                    </div>
+                </div>
+            `;
+        }).join('') || '<div class="text-center py-10 text-slate-300 text-xs italic font-medium">No activity recorded for this ticket.</div>';
+    } catch (e) {
+        container.innerHTML = '<p class="text-red-400 text-xs text-center p-4">Error loading activity log.</p>';
+    }
+}
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
     loadPage();

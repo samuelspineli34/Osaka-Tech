@@ -78,3 +78,9 @@ def add_comment(ticket_id):
         
     ticket_service.add_comment(str(ticket_id), user_id, data['text'])
     return jsonify({"message": "Comment added"}), 201
+
+@ticket_bp.route('/ticket/<id>/history', methods=['GET'])
+@jwt_required()
+def get_ticket_history(id):
+    history = ticket_service.get_history(id)
+    return jsonify(history), 200

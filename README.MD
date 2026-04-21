@@ -66,36 +66,38 @@ O **Service Desk** é uma solução completa para gerenciamento de chamados téc
 ---
 
 # Estrutura do Projeto
+
+```text
 Service-Desk/
 ├── backend/
-│ ├── src/
-│ │ ├── config/ # Configurações de ambiente e constantes
-│ │ ├── controllers/ # Lógica de controle (opcional)
-│ │ ├── dao/ # Data Access Objects (Queries SQL)
-│ │ ├── dto/ # Data Transfer Objects (Formatação de saída)
-│ │ ├── routes/ # Definição de endpoints (Blueprints)
-│ │ ├── services/ # Regras de negócio
-│ │ └── app.py # Ponto de entrada do Flask
-│ ├── .env # Variáveis sensíveis (não versionado)
-│ └── requirements.txt # Dependências Python
+│   ├── src/
+│   │   ├── config/       # Configurações de ambiente e constantes
+│   │   ├── controllers/  # Lógica de controle (opcional)
+│   │   ├── dao/          # Data Access Objects (Queries SQL)
+│   │   ├── dto/          # Data Transfer Objects (Formatação de saída)
+│   │   ├── routes/       # Definição de endpoints (Blueprints)
+│   │   ├── services/     # Regras de negócio
+│   │   └── app.py        # Ponto de entrada do Flask
+│   ├── .env              # Variáveis sensíveis (não versionado)
+│   └── requirements.txt  # Dependências Python
 ├── frontend/
-│ ├── public/ # Ativos estáticos (favicon, imagens)
-│ ├── src/
-│ │ ├── components/ # Componentes reutilizáveis
-│ │ ├── interfaces/ # Tipos TypeScript
-│ │ ├── pages/ # HTML e TS por módulo
-│ │ ├── services/ # Integração com API
-│ │ └── utils/ # Utilitários globais
-│ ├── package.json
-│ └── vite.config.ts
+│   ├── public/           # Ativos estáticos (favicon, imagens)
+│   ├── src/
+│   │   ├── components/   # Componentes reutilizáveis
+│   │   ├── interfaces/   # Tipos TypeScript
+│   │   ├── pages/        # HTML e TS por módulo
+│   │   ├── services/     # Integração com API
+│   │   └── utils/        # Utilitários globais
+│   ├── package.json
+│   └── vite.config.ts
 ├── database/
-│ ├── schema.sql
-│ └── seed.sql
+│   ├── schema.sql
+│   └── seed.sql
 ├── docs/
-│ └── openapi.yaml
-│ └── api-docs.html
+│   ├── openapi.yaml
+│   └── api-docs.html
 └── README.md
----
+```
 
 # Arquitetura e Padrões de Projeto
 

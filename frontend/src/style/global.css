@@ -12,3 +12,11 @@
 .fade-in {
     animation: fadeIn 0.2s ease-out forwards;
 }
+
+#global-loader {
+    transition: opacity 0.3s ease-out;
+}
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+}

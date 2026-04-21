@@ -3,7 +3,7 @@ import sys
 # Mantemos o encoding do Postgres para o Windows não reclamar
 os.environ['PGCLIENTENCODING'] = 'utf-8'
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
@@ -23,11 +23,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 app = Flask(__name__)
 
 # Configuração do CORS para permitir o Bun/Vite acessar o Flask
-CORS(app, resources={r"/api/*": {
-    "origins": ["https://osakatech.vercel.app", "https://service-desk-green-five.vercel.app"],
-    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    "allow_headers": ["Content-Type", "Authorization"]
-}})
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+@app.before_request
+def handle_options():
+    if request.method == 'OPTIONS':
+        # Retorna sucesso para qualquer pré-voo
+        return {'status': 'ok'}, 200
 
 # --- CONFIGURAÇÃO JWT ---
 # Agora pegamos a chave de forma segura através da sua classe Config

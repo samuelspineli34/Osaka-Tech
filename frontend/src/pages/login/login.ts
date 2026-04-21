@@ -1,8 +1,11 @@
 import { authService } from '../../services/api/auth.service';
 import { Modal } from '../../utils/modal';
+import { showLoader, hideLoader } from '../../utils/loaders';
 
 document.getElementById('login-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    showLoader();
+
     const email = (document.getElementById('email') as HTMLInputElement).value;
     const password = (document.getElementById('password') as HTMLInputElement).value;
 
@@ -13,6 +16,7 @@ document.getElementById('login-form')?.addEventListener('submit', async (e) => {
 
         window.location.href = '/dashboard';
     } catch (err) {
+        hideLoader();
         Modal.show({
             title: 'Access Denied',
             message: 'The email or password you entered is incorrect.',

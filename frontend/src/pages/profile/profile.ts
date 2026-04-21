@@ -2,9 +2,12 @@ import { initSidebar } from '../../components/sidebar';
 import { apiClient } from '../../services/api/api-client';
 import { Modal } from '../../utils/modal';
 import { protectRoute } from '../../utils/auth-guard';
-protectRoute(); 
+import { showLoader, hideLoader } from '../../utils/loaders';
+
+protectRoute();
 
 async function initProfilePage() {
+    showLoader();
     initSidebar();
 
     // 1. Carrega dados do localStorage
@@ -48,6 +51,9 @@ async function initProfilePage() {
                 message: 'Password update has failed.',
                 type: 'error'
             });
+        }
+        finally {
+            hideLoader();
         }
     });
 }

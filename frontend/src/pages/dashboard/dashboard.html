@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 </head>
+
 <body class="bg-slate-50 min-h-screen">
+    <!-- Loader Global -->
+    <div id="global-loader" class="fixed inset-0 z-50 flex items-center justify-center bg-white">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+
     <div id="sidebar-container"></div>
     <main class="ml-64 p-10">
         <header class="mb-10">
@@ -45,4 +52,5 @@
         </div>
     </main>
 </body>
+
 </html>

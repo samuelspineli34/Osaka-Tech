@@ -6,7 +6,9 @@ import { apiClient } from '../../services/api/api-client';
 import { Ticket } from '../../interfaces/ticket.interface';
 import { Modal } from '../../utils/modal';
 import { protectRoute } from '../../utils/auth-guard';
-protectRoute(); 
+import { showLoader, hideLoader } from '../../utils/loaders';
+
+protectRoute();
 
 const currentUser = authService.getCurrentUser();
 const isStaff = ['ADMIN', 'MANAGER', 'TECHNICIAN'].includes(currentUser?.role || '');
@@ -32,7 +34,7 @@ function openRatingModal(ticketId: string) {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', ratingHtml);
 
     // Evento para fechar o modal
@@ -107,13 +109,14 @@ function deleteTicket(id: string) {
 
 // --- RENDER ---
 async function loadPage() {
+    showLoader();
     initSidebar();
     const list = document.getElementById('ticket-list');
     if (!list) return;
 
     try {
         const tickets = await ticketService.getAllTickets();
-        
+
         list.innerHTML = tickets.map(t => {
             const canRate = t.status === 'CLOSED' && !t.rating && t.user_id === currentUser?.id;
 
@@ -121,31 +124,31 @@ async function loadPage() {
                 <tr class="hover:bg-slate-50/50 transition-colors border-b border-slate-100">
                     <td class="px-8 py-6">
                         <p class="font-bold text-slate-800">${t.title}</p>
-                        <p class="text-[10px] text-slate-400 font-mono uppercase">${t.id.substring(0,8)}</p>
+                        <p class="text-[10px] text-slate-400 font-mono uppercase">${t.id.substring(0, 8)}</p>
                     </td>
                     <td class="px-8 py-6">
                         <span class="px-3 py-1 rounded-lg text-[10px] font-black border uppercase 
-                            ${t.status === 'CLOSED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
-                              t.status === 'IN_PROGRESS' ? 'bg-amber-50 text-amber-600 border-amber-100' : 
-                              'bg-blue-50 text-blue-600 border-blue-100'}">
+                            ${t.status === 'CLOSED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                    t.status === 'IN_PROGRESS' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                        'bg-blue-50 text-blue-600 border-blue-100'}">
                             ${t.status.replace('_', ' ')}
                         </span>
                     </td>
                     <td class="px-8 py-6">
                         <span class="px-3 py-1 rounded-lg text-[10px] font-black border uppercase 
-                            ${t.priority === 'HIGH' ? 'bg-red-50 text-red-600 border-red-100' : 
-                              t.priority === 'MEDIUM' ? 'bg-amber-50 text-amber-600 border-amber-100' : 
-                              'bg-slate-100 text-slate-500 border-slate-200'}">
+                            ${t.priority === 'HIGH' ? 'bg-red-50 text-red-600 border-red-100' :
+                    t.priority === 'MEDIUM' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                        'bg-slate-100 text-slate-500 border-slate-200'}">
                             ${t.priority}
                         </span>
                     </td>
                     <td class="px-8 py-6">
-                        ${t.rating 
-                            ? `<div class="flex text-amber-400 text-xs">${'★'.repeat(t.rating)}</div>` 
-                            : canRate 
-                                ? `<button data-rate-id="${t.id}" class="px-3 py-1 bg-amber-50 text-amber-600 border border-amber-200 rounded-lg text-[10px] font-black hover:bg-amber-100 transition-all uppercase tracking-tighter">Rate Service</button>`
-                                : `<span class="text-slate-300 text-[10px] font-bold uppercase italic">Pending</span>`
-                        }
+                        ${t.rating
+                    ? `<div class="flex text-amber-400 text-xs">${'★'.repeat(t.rating)}</div>`
+                    : canRate
+                        ? `<button data-rate-id="${t.id}" class="px-3 py-1 bg-amber-50 text-amber-600 border border-amber-200 rounded-lg text-[10px] font-black hover:bg-amber-100 transition-all uppercase tracking-tighter">Rate Service</button>`
+                        : `<span class="text-slate-300 text-[10px] font-bold uppercase italic">Pending</span>`
+                }
                     </td>
                     <td class="px-8 py-6 text-sm text-slate-600 font-bold">${t.user_name}</td>
                     <td class="px-8 py-6 text-right">
@@ -161,7 +164,7 @@ async function loadPage() {
         }).join('');
 
         // ATIVAÇÃO DOS EVENTOS SEM ONCLICK (Delegação de Eventos)
-        
+
         // Botões de Avaliar
         document.querySelectorAll('[data-rate-id]').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -187,11 +190,14 @@ async function loadPage() {
         });
 
     } catch (e) { console.error(e); }
+    finally {
+        hideLoader();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadPage();
-    
+
     document.getElementById('ticket-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = (document.getElementById('field-id') as HTMLInputElement).value;

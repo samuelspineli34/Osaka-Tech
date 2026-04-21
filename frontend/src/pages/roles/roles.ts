@@ -2,7 +2,9 @@ import { initSidebar } from '../../components/sidebar';
 import { apiClient } from '../../services/api/api-client';
 import { Modal } from '../../utils/modal';
 import { protectRoute } from '../../utils/auth-guard';
-protectRoute(); 
+import { showLoader, hideLoader } from '../../utils/loaders';
+
+protectRoute();
 
 interface Permission { id: string; code: string; description: string; }
 interface Role { id: string; name: string; permissions: string[]; }
@@ -55,6 +57,7 @@ const openRoleModal = async (role?: Role) => {
 
 // --- RENDERING ---
 async function loadRoles() {
+    showLoader();
     initSidebar();
     const grid = document.getElementById('roles-grid');
     if (!grid) return;
@@ -83,11 +86,14 @@ async function loadRoles() {
             </div>
         `).join('');
     } catch (e) { console.error(e); }
+    finally {
+        hideLoader();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadRoles();
-    
+
     document.getElementById('role-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = (document.getElementById('field-role-id') as HTMLInputElement).value;
@@ -101,13 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             id ? await apiClient.put(`/roles/${id}`, data) : await apiClient.post('/roles', data);
-            
-            closeRoleModal(); 
-            
+
+            closeRoleModal();
+
             loadRoles();
             Modal.show({ title: 'Success', message: 'Role saved successfully.', type: 'success' });
-        } catch (err) { 
-            Modal.show({ title: 'Error', message: 'Failed to save role.', type: 'error' }); 
+        } catch (err) {
+            Modal.show({ title: 'Error', message: 'Failed to save role.', type: 'error' });
         }
     });
 });

@@ -3,6 +3,8 @@ import { userService } from '../../services/api/user.service';
 import { User } from '../../interfaces/user.interface';
 import { Modal } from '../../utils/modal';
 import { protectRoute } from '../../utils/auth-guard';
+import { showLoader, hideLoader } from '../../utils/loaders';
+
 protectRoute(); 
 
 // 1. Funções globais para o Modal (precisam estar no window para o HTML acessar)
@@ -72,6 +74,7 @@ const renderUserItem = (user: User): string => {
 
 
 async function initPage() {
+    showLoader();
     initSidebar();
     const listElement = document.getElementById('user-list');
     if (!listElement) return;
@@ -81,6 +84,9 @@ async function initPage() {
         listElement.innerHTML = users.map(renderUserItem).join('');
     } catch (error) {
         console.error(error);
+    }
+    finally {
+        hideLoader();
     }
 }
 

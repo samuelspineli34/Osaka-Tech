@@ -1,0 +1,298 @@
+openapi: 3.0.0
+info:
+  title: ServiceDesk API
+  description: |
+    API Corporativa para gerenciamento de chamados técnicos e controle de acesso (RBAC).
+    
+    **Segurança:** A maioria dos endpoints requer um Token JWT enviado no cabeçalho `Authorization: Bearer <TOKEN>`.
+  version: 1.0.0
+
+tags:
+  - name: Authentication
+    description: Endpoints para login e controle de sessão.
+  - name: Dashboard
+    description: Métricas agregadas para visão gerencial.
+  - name: Users
+    description: Gerenciamento de membros da organização e perfil pessoal.
+  - name: Roles & Permissions
+    description: Configuração de cargos e níveis de acesso dinâmicos.
+  - name: Tickets
+    description: Ciclo de vida completo dos chamados e atendimento (Timeline/Rating).
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string, example: "John Frusciante" }
+        email: { type: string, format: email, example: "john@chilipeppers.com" }
+        department: { type: string, example: "R&D" }
+        role: { type: string, example: "ADMIN" }
+        permissions:
+          type: array
+          items: { type: string }
+
+    Ticket:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string, example: "Monitor not working" }
+        description: { type: string, example: "The screen stays black after turning on." }
+        status: { type: string, enum: [OPEN, IN_PROGRESS, CLOSED] }
+        priority: { type: string, enum: [LOW, MEDIUM, HIGH] }
+        user_id: { type: string, format: uuid }
+        user_name: { type: string, example: "Alexander Wright" }
+        created_at: { type: string, example: "2024-04-20 14:30" }
+        rating: { type: integer, minimum: 1, maximum: 5, nullable: true }
+
+    Comment:
+      type: object
+      properties:
+        text: { type: string, example: "Technician is on the way." }
+        user: { type: string, example: "Main Admin" }
+        date: { type: string, example: "20/04 15:00" }
+
+    Role:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string, example: "Technician L1" }
+        permissions:
+          type: array
+          items: { type: string, example: "manage_tickets" }
+
+    Permission:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, example: "manage_users" }
+        description: { type: string, example: "Allows creating and deleting users" }
+
+    Error:
+      type: object
+      properties:
+        error: { type: string, example: "Unauthorized access" }
+
+security:
+  - bearerAuth: []
+
+paths:
+  /login:
+    post:
+      tags: [Authentication]
+      summary: Realizar login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  user: { $ref: '#/components/schemas/User' }
+        '401':
+          description: Credenciais inválidas
+
+  /dashboard/stats:
+    get:
+      tags: [Dashboard]
+      summary: Estatísticas globais
+      responses:
+        '200':
+          description: Dados para os cards do dashboard
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  openTickets: { type: integer }
+                  resolvedTickets: { type: integer }
+                  averageRating: { type: number }
+                  totalUsers: { type: integer }
+
+  /user:
+    get:
+      tags: [Users]
+      summary: Listar usuários ativos
+      responses:
+        '200':
+          description: Lista de objetos User
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/User' }
+    post:
+      tags: [Users]
+      summary: Criar novo usuário (Requer manage_users)
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/User' }
+      responses:
+        '201':
+          description: Criado
+
+  /user/{user_id}:
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      tags: [Users]
+      summary: Atualizar dados de um usuário
+      responses:
+        '200':
+          description: Atualizado
+    delete:
+      tags: [Users]
+      summary: Remover usuário (Soft Delete)
+      responses:
+        '200':
+          description: Desativado
+
+  /me/password:
+    put:
+      tags: [Users]
+      summary: Alterar própria senha
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword: { type: string }
+                newPassword: { type: string }
+      responses:
+        '200':
+          description: Senha atualizada
+
+  /roles:
+    get:
+      tags: [Roles & Permissions]
+      summary: Listar cargos e permissões associadas
+      responses:
+        '200':
+          description: Lista de cargos
+    post:
+      tags: [Roles & Permissions]
+      summary: Criar novo cargo com permissões
+      responses:
+        '201':
+          description: Criado
+
+  /permissions:
+    get:
+      tags: [Roles & Permissions]
+      summary: Listar todas as permissões do sistema
+      responses:
+        '200':
+          description: OK
+
+  /ticket:
+    get:
+      tags: [Tickets]
+      summary: Listar chamados (Filtra por dono se for USER)
+      responses:
+        '200':
+          description: Lista de tickets
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Ticket' }
+    post:
+      tags: [Tickets]
+      summary: Abrir novo chamado
+      responses:
+        '201':
+          description: Criado
+
+  /ticket/{ticket_id}:
+    parameters:
+      - name: ticket_id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      tags: [Tickets]
+      summary: Editar chamado
+      responses:
+        '200':
+          description: Atualizado
+    delete:
+      tags: [Tickets]
+      summary: Arquivar chamado (Soft Delete)
+      responses:
+        '200':
+          description: Arquivado
+
+  /ticket/{ticket_id}/rate:
+    put:
+      tags: [Tickets]
+      summary: Avaliar chamado (Dono apenas)
+      parameters:
+        - name: ticket_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating: { type: integer, minimum: 1, maximum: 5 }
+      responses:
+        '200':
+          description: Avaliado
+
+  /ticket/{ticket_id}/comments:
+    get:
+      tags: [Tickets]
+      summary: Ver histórico de atendimento
+      parameters:
+        - name: ticket_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Timeline
+    post:
+      tags: [Tickets]
+      summary: Responder chamado
+      parameters:
+        - name: ticket_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text: { type: string }
+      responses:
+        '201':
+          description: Comentado

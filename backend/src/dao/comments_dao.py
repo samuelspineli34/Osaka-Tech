@@ -2,8 +2,15 @@ import psycopg2
 from config.config import Config
 
 class CommentDAO:
-    def get_connection(self):
-        return psycopg2.connect(**Config.get_db_config(), application_name='ServiceDesk', client_encoding='utf8')
+    def get_connection():
+        config = Config.get_db_config()
+        
+        if isinstance(config, str):
+            # Se for a URL do Render
+            return psycopg2.connect(config)
+        else:
+            # Se for o dicionário local
+            return psycopg2.connect(**config)
 
     def add_comment(self, ticket_id, user_id, text):
         conn = self.get_connection()

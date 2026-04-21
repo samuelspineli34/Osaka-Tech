@@ -2,8 +2,15 @@ import psycopg2
 from config.config import Config
 
 class RoleDAO:
-    def get_connection(self):
-        return psycopg2.connect(**Config.get_db_config(), application_name='ServiceDesk')
+    def get_connection():
+        config = Config.get_db_config()
+        
+        if isinstance(config, str):
+            # Se for a URL do Render
+            return psycopg2.connect(config)
+        else:
+            # Se for o dicionário local
+            return psycopg2.connect(**config)
 
     def get_all_with_permissions(self):
         conn = self.get_connection()

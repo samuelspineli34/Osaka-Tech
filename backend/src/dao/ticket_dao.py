@@ -4,8 +4,15 @@ from dto.ticket_dto import TicketDTO
 from datetime import datetime
 
 class TicketDAO:
-    def get_connection(self):
-        return psycopg2.connect(**Config.get_db_config(), application_name='ServiceDesk', client_encoding='utf8')
+    def get_connection():
+        config = Config.get_db_config()
+        
+        if isinstance(config, str):
+            # Se for a URL do Render
+            return psycopg2.connect(config)
+        else:
+            # Se for o dicionário local
+            return psycopg2.connect(**config)
 
     def get_all(self, user_id=None):
         conn = self.get_connection()

@@ -1,39 +1,47 @@
 import os
 from dotenv import load_dotenv
+import urllib.parse as up
 
-# Carrega o arquivo .env garantindo UTF-8
 load_dotenv()
 
 class Config:
     # --- CONFIGURAÇÕES DE AMBIENTE ---
     ENV = os.getenv('FLASK_ENV', 'development')
-
-    # --- DADOS DO BANCO (Defaults apenas para conexão local padrão) ---
-    DB_HOST = os.getenv('DB_HOST', 'localhost')
-    DB_PORT = os.getenv('DB_PORT', '5432')
-    DB_USER = os.getenv('DB_USER', 'postgres')
-
-    # --- SEGREDOS CRÍTICOS (SEM DEFAULTS - ERRO FATAL SE FALTAR) ---
-    DB_PASSWORD = os.getenv('DB_PASSWORD')
-    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
-
-    # Validação rigorosa: O sistema trava se estas variáveis não existirem no .env
-    if not DB_PASSWORD:
-        raise ValueError("ERRO CRÍTICO: DB_PASSWORD não definida no arquivo .env")
     
+    # --- SEGREDOS CRÍTICOS ---
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
     if not JWT_SECRET_KEY:
-        raise ValueError("ERRO CRÍTICO: JWT_SECRET_KEY não definida no arquivo .env")
+        raise ValueError("ERRO CRÍTICO: JWT_SECRET_KEY não definida")
 
-    # --- LÓGICA DE BANCO POR AMBIENTE ---
-    if ENV == 'production':
-        DB_NAME = 'servicedeskdb_prod'
+    # --- LÓGICA DE BANCO DE DADOS ---
+    # No Render, essa variável existirá automaticamente se você conectar o banco ao serviço
+    DATABASE_URL = os.getenv('DATABASE_URL')
+
+    if DATABASE_URL:
+        # Se estamos no Render/Produção usando DATABASE_URL
+        # (Opcional: correção de protocolo para o SQLAlchemy/Psycopg2 se necessário)
+        if DATABASE_URL.startswith("postgres://"):
+            DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
     else:
-        # Em desenvolvimento, tenta ler do ENV, se não houver, usa o nome padrão de dev
+        # Fallback para Configurações Locais (Desenvolvimento)
+        DB_HOST = os.getenv('DB_HOST', 'localhost')
+        DB_PORT = os.getenv('DB_PORT', '5432')
+        DB_USER = os.getenv('DB_USER', 'postgres')
+        DB_PASSWORD = os.getenv('DB_PASSWORD')
         DB_NAME = os.getenv('DB_NAME', 'servicedeskdb_dev')
+        
+        if not DB_PASSWORD and ENV == 'development':
+             print("Aviso: DB_PASSWORD não definida, tentando conexão sem senha...")
 
     @classmethod
     def get_db_config(cls):
-        """Retorna dicionário pronto para o psycopg2.connect()"""
+        """
+        Retorna os parâmetros para o psycopg2.connect()
+        Pode retornar uma string (DSN) ou um dicionário.
+        """
+        if cls.DATABASE_URL:
+            return cls.DATABASE_URL  # Psycopg2 aceita a URL diretamente
+        
         return {
             "host": cls.DB_HOST,
             "port": cls.DB_PORT,

@@ -1,6 +1,6 @@
-# Service Desk - Corporate Ticket Management System
+# Osaka Tech - Corporate Ticket Management System
 
-O **Service Desk** é uma solução completa para gerenciamento de chamados técnicos internos. O sistema foi desenvolvido com uma arquitetura modular, seguindo padrões de mercado como **DAO (Data Access Object)**, **DTO (Data Transfer Object)** e **RBAC (Role-Based Access Control)** para garantir segurança e escalabilidade.
+O **Osaka Tech** é uma solução completa para gerenciamento de chamados técnicos internos. O sistema foi desenvolvido com uma arquitetura modular, seguindo padrões de mercado como **DAO (Data Access Object)**, **DTO (Data Transfer Object)** e **RBAC (Role-Based Access Control)** para garantir segurança e escalabilidade.
 
 ---
 
@@ -119,7 +119,7 @@ As regras de negócio, validações e orquestração de chamadas estão concentr
 A segurança foi tratada como prioridade no desenvolvimento, implementando técnicas modernas de proteção.
 
 ### Controle de Acesso Baseado em Cargos (RBAC)
-Diferente de sistemas com cargos fixos, o Service Desk utiliza permissões dinâmicas vinculadas a cargos (Roles). Isso permite que o administrador crie novos níveis de acesso e selecione exatamente quais funcionalidades cada cargo pode executar.
+Diferente de sistemas com cargos fixos, o Osaka Tech utiliza permissões dinâmicas vinculadas a cargos (Roles). Isso permite que o administrador crie novos níveis de acesso e selecione exatamente quais funcionalidades cada cargo pode executar.
 
 ### Proteção de Identificadores (UUID v4)
 Em vez de IDs sequenciais (1, 2, 3...), o sistema utiliza UUIDs (Universally Unique Identifiers). Isso impede ataques de enumeração de recursos, onde usuários mal-intencionados tentam acessar dados alterando números na URL.

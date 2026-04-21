@@ -104,7 +104,7 @@ class UserDAO:
         conn = self.get_connection()
         cursor = conn.cursor()
         
-        # Esta query busca o usuário e faz o JOIN com Roles e Permissions
+        # Usamos TRIM e LOWER para evitar erros de digitação ou espaços no banco
         query = """
             SELECT 
                 u.id, u.name, u.email, u.department, u.password_hash, 
@@ -114,15 +114,17 @@ class UserDAO:
             LEFT JOIN roles r ON u.role_id = r.id
             LEFT JOIN role_permissions rp ON r.id = rp.role_id
             LEFT JOIN permissions p ON rp.permission_id = p.id
-            WHERE u.email = %s AND u.deleted_at IS NULL
+            WHERE TRIM(LOWER(u.email)) = TRIM(LOWER(%s)) AND u.deleted_at IS NULL
         """
         cursor.execute(query, (email,))
         rows = cursor.fetchall()
         
         if not rows:
+            cursor.close()
+            conn.close()
             return None
 
-        # Como a query retorna uma linha por permissão, agrupamos as permissões em uma lista
+        # Agrupa as permissões
         permissions = [row[6] for row in rows if row[6] is not None]
         first_row = rows[0]
 

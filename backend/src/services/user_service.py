@@ -22,17 +22,30 @@ class UserService:
         return user_dto.to_dict() if user_dto else None
         
     def authenticate(self, email, password):
+        print(f"[AUTH] Tentativa de login para: {email}") # Log no Render
+        
         user_data = self.dao.get_by_email_with_permissions(email)
-        if user_data and check_password_hash(user_data['password_hash'], password):
-            # O Token agora carrega as permissões REAIS do cargo dele
+        
+        if not user_data:
+            print(f"[AUTH] Usuario nao encontrado no banco: {email}")
+            return None
+
+        # Verifica a senha
+        is_valid = check_password_hash(user_data['password_hash'], password)
+        
+        if is_valid:
+            print(f"[AUTH] Sucesso no login: {email}")
             access_token = create_access_token(
                 identity=user_data['id'], 
                 additional_claims={
                     "role": user_data['role_name'],
-                    "permissions": user_data['permissions'] # ['manage_users', 'view_all_tickets']
+                    "permissions": user_data['permissions']
                 }
             )
             return {"token": access_token, "user": user_data['info']}
+        else:
+            print(f"[AUTH] Senha incorreta para o usuario: {email}")
+            return None
 
     def create_user(self, data):
         # Se não vier senha no form, usa a padrão: Welcome@123

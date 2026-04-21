@@ -18,6 +18,13 @@ document.getElementById('login-form')?.addEventListener('submit', async (e) => {
 
         const email = emailInput.value;
         const password = passwordInput.value;
+        
+        const rememberMe = (document.getElementById('remember') as HTMLInputElement)?.checked;
+        if (rememberMe) {
+            localStorage.setItem('savedEmail', email);
+        } else {
+            localStorage.removeItem('savedEmail');
+        }
 
         // Corre corrida: O login vs um timer de 10 segundos
         const timeoutPromise = new Promise((_, reject) => {

@@ -4,7 +4,7 @@ import { showLoader, hideLoader } from '../../utils/loaders';
 
 document.getElementById('login-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    showLoader();
+    showLoader(); // Mostra o loader
 
     const email = (document.getElementById('email') as HTMLInputElement).value;
     const password = (document.getElementById('password') as HTMLInputElement).value;
@@ -14,18 +14,17 @@ document.getElementById('login-form')?.addEventListener('submit', async (e) => {
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
 
+        // NÃO esconda o loader no sucesso, pois a página vai mudar imediatamente.
+        // Isso evita que o loader fique "piscando" antes da página trocar.
         window.location.href = '/dashboard';
     } catch (err) {
+        // Esconde apenas no erro
         hideLoader();
         Modal.show({
             title: 'Access Denied',
             message: 'The email or password you entered is incorrect.',
             type: 'error'
         });
-    }
-    finally {
-        hideLoader();
-
     }
 });
 
